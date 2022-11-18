@@ -2,12 +2,12 @@ import torch
 from torch.nn import Sequential, Linear, BatchNorm1d, ReLU
 import torch.nn.functional as F
 from torch_geometric.nn import SAGEConv, GCNConv, GATConv, GINConv, TopKPooling
-from torch_geometric.nn import global_max_pool as gmp
-from torch_geometric.nn import global_mean_pool as gap
 
 # optimizer = torch.optim.Adam(model.parameters(), lr=0.01, weight_decay=5e-4)
+
+
 class GraphSage(torch.nn.Module):
-    def __init__(self,num_features, num_classes):
+    def __init__(self, num_features, num_classes):
         super(GraphSage, self).__init__()
         self.sage1 = SAGEConv(num_features, 16)  # 定义两层GraphSAGE层
         self.sage2 = SAGEConv(16, num_classes)
@@ -20,7 +20,8 @@ class GraphSage(torch.nn.Module):
 
         x = F.log_softmax(x, dim=1)
         return x
-    
+
+
 class GraphSageTopK(torch.nn.Module):
     def __init__(self, num_features, num_classes):
         super().__init__()
@@ -98,7 +99,7 @@ class GAT(torch.nn.Module):
         x = F.dropout(x, p=0.6, training=self.training)
         x = self.conv2(x, edge_index)
         return F.log_softmax(x, dim=-1)
-    
+
 
 # model = Net(dataset.num_features, 32, dataset.num_classes).to(device)
 # optimizer = torch.optim.Adam(model.parameters(), lr=0.01)
@@ -141,6 +142,7 @@ class GIN(torch.nn.Module):
         x = self.lin2(x)
         return F.log_softmax(x, dim=-1)
 
+
 def get_opts(model, model_name):
     if model_name == 'GCN':
         return torch.optim.Adam([
@@ -152,3 +154,6 @@ def get_opts(model, model_name):
         return torch.optim.Adam(model.parameters(), lr=0.01, weight_decay=5e-4)
     else:
         return torch.optim.Adam(model.parameters(), lr=0.005, weight_decay=5e-4)
+
+
+model_dict = {'GCN': GCN, 'GAT': GAT, 'GraphSage': GraphSage}

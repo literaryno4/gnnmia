@@ -1,13 +1,16 @@
 import torch
 import torch.nn.functional as F
 
+
 def train(model, optimizer, data):
     model.train()
     optimizer.zero_grad()
-    F.nll_loss(model(data.x, data.edge_index, data.edge_attr)[data.train_mask], data.y[data.train_mask]).backward()
+    F.nll_loss(model(data.x, data.edge_index, data.edge_attr)[
+               data.train_mask], data.y[data.train_mask]).backward()
     optimizer.step()
-    
+
     return model
+
 
 @torch.no_grad()
 def test(model, data):
@@ -19,7 +22,8 @@ def test(model, data):
         accs.append(acc)
     return accs
 
-def train_model(model, optimizer, data, epoches = 200):
+
+def train_model(model, optimizer, data, epoches=200):
     best_model = None
     best_val_acc = test_acc = 0
     for epoch in range(1, epoches + 1):
@@ -31,7 +35,7 @@ def train_model(model, optimizer, data, epoches = 200):
             best_model = model
         log = 'Epoch: {:03d}, Train: {:.4f}, Val: {:.4f}, Test: {:.4f}'
     print(log.format(epoch, train_acc, best_val_acc, test_acc))
-    return best_model
+    return best_model, test_acc
 
 # def train_shadow(model_shadow, optimizer, data):
 #     best_model_shadow = None

@@ -9,6 +9,8 @@ def argparser():
                         choices=['GCN', 'GraphSage', 'GAT'], help='target model of the attack')
     parser.add_argument('--shadow_model', type=str, default='GCN', choices=[
                         'GCN', 'GraphSage', 'GAT'], help='shadow model to imitate target model')
+    parser.add_argument('--attack_model', type=str, default='GraphSage', choices=[
+                        'GCN', 'GraphSage', 'GAT'], help='attack model to do membership inference')
     parser.add_argument('--data_path', type=str,
                         default='./data', help='data path of dataset')
     parser.add_argument('--log_dir', type=str,

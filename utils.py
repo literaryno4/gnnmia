@@ -1,7 +1,18 @@
 import torch
+import numpy as np
+
 
 def format_model_name(model_name):
     return model_name + '          '
+
+
+def print_attack_result(best_test_acc_list):
+    for i in range(len(best_test_acc_list)):
+        print("class {}: {}".format(i, best_test_acc_list[i]))
+
+    print('{:.2f}/{:.2f}    '.format(np.mean(best_test_acc_list)
+          * 100, np.max(best_test_acc_list) * 100))
+
 
 def get_opts(model, model_name):
     if model_name == 'GCN':
@@ -14,7 +25,7 @@ def get_opts(model, model_name):
         return torch.optim.Adam(model.parameters(), lr=0.01, weight_decay=5e-4)
     else:
         return torch.optim.Adam(model.parameters(), lr=0.005, weight_decay=5e-4)
-    
+
 
 def process_mask(data):
     train_mask = []
@@ -39,5 +50,5 @@ def process_mask(data):
     data.train_mask = torch.tensor(train_mask)
     data.val_mask = torch.tensor(val_mask)
     data.test_mask = torch.tensor(test_mask)
-    
+
     return data
