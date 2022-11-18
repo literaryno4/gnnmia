@@ -1,7 +1,9 @@
 import torch
 from torch.nn import Sequential, Linear, BatchNorm1d, ReLU
 import torch.nn.functional as F
-from torch_geometric.nn import SAGEConv, GCNConv, GATConv, GINConv, global_add_pool
+from torch_geometric.nn import SAGEConv, GCNConv, GATConv, GINConv, TopKPooling
+from torch_geometric.nn import global_max_pool as gmp
+from torch_geometric.nn import global_mean_pool as gap
 
 # optimizer = torch.optim.Adam(model.parameters(), lr=0.01, weight_decay=5e-4)
 class GraphSage(torch.nn.Module):
@@ -16,8 +18,48 @@ class GraphSage(torch.nn.Module):
         x = F.dropout(x, training=self.training)
         x = self.sage2(x, edge_index)
 
-        return F.log_softmax(x, dim=1)
+        x = F.log_softmax(x, dim=1)
+        return x
     
+class GraphSageTopK(torch.nn.Module):
+    def __init__(self, num_features, num_classes):
+        super().__init__()
+
+        self.conv1 = SAGEConv(num_features, 16)
+        self.pool1 = TopKPooling(16, ratio=1)
+        self.conv2 = SAGEConv(16, 16)
+        self.pool2 = TopKPooling(16, ratio=1)
+        self.conv3 = SAGEConv(16, 16)
+        self.pool3 = TopKPooling(16, ratio=1)
+
+        self.lin1 = torch.nn.Linear(16, 16)
+        self.lin2 = torch.nn.Linear(16, 8)
+        self.lin3 = torch.nn.Linear(8, num_classes)
+
+    def forward(self, x, edge_index, edge_weight):
+        batch = None
+
+        x = F.relu(self.conv1(x, edge_index))
+        x, edge_index, _, batch, _, _ = self.pool1(x, edge_index, None, batch)
+        #x1 = torch.cat([gmp(x, batch), gap(x, batch)], dim=1)
+
+        x = F.relu(self.conv2(x, edge_index))
+        x, edge_index, _, batch, _, _ = self.pool2(x, edge_index, None, batch)
+        #x2 = torch.cat([gmp(x, batch), gap(x, batch)], dim=1)
+
+        x = F.relu(self.conv3(x, edge_index))
+        x, edge_index, _, batch, _, _ = self.pool3(x, edge_index, None, batch)
+        #x3 = torch.cat([gmp(x, batch), gap(x, batch)], dim=1)
+
+        #x = x1 + x2 + x3
+
+        x = F.relu(self.lin1(x))
+        x = F.dropout(x, p=0.5, training=self.training)
+        x = F.relu(self.lin2(x))
+        x = F.log_softmax(self.lin3(x), dim=1)
+
+        return x
+
 
 #     optimizer = torch.optim.Adam([
 #         dict(params=model.conv1.parameters(), weight_decay=5e-4),
