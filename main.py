@@ -97,7 +97,7 @@ if __name__ == '__main__':
 
     # train shadow model
     shadow_models = train_shadow_models(dataset, shadow_model_name)
-    # take logits of target model as test set of attack model
+    # take logits of shadow model as test set of attack model
     attack_in_train_list, attack_out_train_list = attack_nodes_list(
         shadow_models, dataset[0])
 
