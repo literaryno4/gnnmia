@@ -1,3 +1,4 @@
+import logging
 import torch
 import numpy as np
 
@@ -8,10 +9,10 @@ def format_model_name(model_name):
 
 def print_attack_result(best_test_acc_list):
     for i in range(len(best_test_acc_list)):
-        print("class {}: {}".format(i, best_test_acc_list[i]))
+        logging.info("class {}: {}".format(i, best_test_acc_list[i]))
 
-    print('{:.2f}/{:.2f}    '.format(np.mean(best_test_acc_list)
-          * 100, np.max(best_test_acc_list) * 100))
+    logging.info('avg/best acc: {:.2f}/{:.2f}    '.format(np.mean(best_test_acc_list)
+                                                          * 100, np.max(best_test_acc_list) * 100))
 
 
 def get_opts(model, model_name):

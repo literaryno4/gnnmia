@@ -7,7 +7,10 @@ from models import get_opts, model_dict
 from construct_attack_dataset import construct_attack_dataset
 from utils import process_mask, print_attack_result
 from argparser import argparser
-print("prerequirement satisfied!")
+import logging
+import os
+import sys
+import datetime
 
 
 def attack_nodes_list(models, data):
@@ -76,16 +79,21 @@ if __name__ == '__main__':
     device = args.device
     device = torch.device('cuda' if device ==
                           'cuda' and torch.cuda.is_available() else 'cpu')
-    print("devece: {}".format(device))
     dataset_name = args.dataset
     target_model_name = args.target_model
     shadow_model_name = args.shadow_model
     attack_model_name = args.attack_model
     path = args.data_path
-    log_dir = args.log_dir
+    logfile_name = args.logfile_name
 
-    print("dataset: {}, target_model: {}, shadow_model: {}".format(
-        dataset_name, target_model_name, shadow_model_name))
+    logging.basicConfig(level=logging.DEBUG,
+                        format='[%(levelname)s-%(asctime)s]: %(message)s',
+                        handlers=[logging.FileHandler(logfile_name), logging.StreamHandler(sys.stdout)])
+
+    logging.debug("prerequirement satisfied!")
+    logging.info("devece: {}".format(device))
+    logging.info("dataset: {}, target_model: {}, shadow_model: {}, attack_model".format(
+        dataset_name, target_model_name, shadow_model_name, attack_model_name))
 
     dataset = Planetoid(path, dataset_name, transform=T.NormalizeFeatures())
 

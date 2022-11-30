@@ -34,7 +34,7 @@
 
 > 如果后面不打算合并代码，直接复制本代码仓库文件夹即可
 
-1. 在github上fork本仓库到你自己账户下；
+1. 在github上fork[本仓库](https://github.com/literaryno4/gnnmia)到你自己账户下；
 2. 本地终端输入：
 ```
 git clone **刚才fork到你账户下的仓库代码链接**

@@ -1,3 +1,4 @@
+import logging
 import torch
 import numpy as np
 import torch.nn.functional as F
@@ -90,8 +91,8 @@ def make_train_test_set(refdataset, in_train, out_train, in_test, out_test, uses
     val_mask = torch.tensor(val_mask)
     test_mask = torch.tensor(test_mask)
 
-    print("member: {}, all: {}".format(sum(y), len(y)))
-    print("member train: {}, train: {}".format(
+    logging.info("member: {}, all: {}".format(sum(y), len(y)))
+    logging.info("member train: {}, train: {}".format(
         sum(y[train_mask]), len(y[train_mask])))
 
     return x, y, train_mask, val_mask, test_mask
@@ -131,7 +132,7 @@ def process_edges(x, refdataset, in_train, out_train):
             edge_index[1].append(data.edge_index[1][i])
 
     edge_index = torch.tensor(edge_index)
-    print("number of edges: {}".format(len(edge_index[0])))
+    logging.info("number of edges: {}".format(len(edge_index[0])))
 
     return edge_index
 
@@ -142,17 +143,17 @@ def construct_attack_dataset(refdataset, in_train, out_train, in_test, out_test)
     Returns:
         gnn_mia_dataset: final graph dataset to be attacked
     """
-    print("Constructing graph dataset...")
-    print("preparing nodes...")
+    logging.info("Constructing graph dataset...")
+    logging.info("preparing nodes...")
     x, y, train_mask, val_mask, test_mask = make_train_test_set(
         refdataset, in_train, out_train, in_test, out_test)
-    print("Nodes: {}".format(x.shape))
-    print("preparing edges...")
+    logging.info("Nodes: {}".format(x.shape))
+    logging.info("preparing edges...")
     edge_index = process_edges(x, refdataset, in_train, out_train)
 
     # make graph dataset to attack using pytorch geometric api
     gnn_mia_dataset = Data(x=x, y=y, test_mask=test_mask,
                            train_mask=train_mask, val_mask=val_mask, edge_index=edge_index)
-    print("graph dataset constructed!")
+    logging.info("graph dataset constructed!")
 
     return gnn_mia_dataset

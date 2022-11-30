@@ -13,8 +13,8 @@ def argparser():
                         'GCN', 'GraphSage', 'GAT'], help='attack model to do membership inference')
     parser.add_argument('--data_path', type=str,
                         default='./data', help='data path of dataset')
-    parser.add_argument('--log_dir', type=str,
-                        default='./gammia_mm_diff_target_log.txt', help='log file path')
+    parser.add_argument('--logfile_name', type=str,
+                        default='./log/log.log', help='log file path')
     parser.add_argument('--epoches', type=int, default=200,
                         help='epoches to train target model and shadow model')
     parser.add_argument('--device', type=str, default='cpu',
