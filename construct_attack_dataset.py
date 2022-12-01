@@ -95,10 +95,10 @@ def make_train_test_set(refdataset, in_train, out_train, in_test, out_test, uses
     logging.info("member train: {}, train: {}".format(
         sum(y[train_mask]), len(y[train_mask])))
 
-    return x, y, train_mask, val_mask, test_mask
+    return x, y, train_mask, val_mask, test_mask, x_attack_in_train, x_attack_out_train
 
 
-def process_edges(x, refdataset, in_train, out_train):
+def process_edges(x, refdataset, x_attack_in_train, x_attack_out_train):
     """To generate edge_index according to the train set info
     Args:
         x: All nodes
@@ -107,12 +107,10 @@ def process_edges(x, refdataset, in_train, out_train):
         edge_index: final edge index of our graph dataset
     """
     data = refdataset
-    attack_in_train, attack_out_train = in_train, out_train
-    length = int(data.train_mask.sum() / 2)
 
     # TODO: can be optimized
-    x_attack_in_train = rng.choice(attack_in_train, length)
-    x_attack_out_train = rng.choice(attack_out_train, length)
+    #x_attack_in_train = rng.choice(attack_in_train, length)
+    #x_attack_out_train = rng.choice(attack_out_train, length)
 
     threshold = (np.mean(np.max(x_attack_out_train, axis=1)) +
                  np.mean(np.max(x_attack_in_train, axis=1))) / 2
@@ -145,11 +143,12 @@ def construct_attack_dataset(refdataset, in_train, out_train, in_test, out_test)
     """
     logging.info("Constructing graph dataset...")
     logging.info("preparing nodes...")
-    x, y, train_mask, val_mask, test_mask = make_train_test_set(
+    x, y, train_mask, val_mask, test_mask, x_attack_in_train, x_attack_out_train = make_train_test_set(
         refdataset, in_train, out_train, in_test, out_test)
     logging.info("Nodes: {}".format(x.shape))
     logging.info("preparing edges...")
-    edge_index = process_edges(x, refdataset, in_train, out_train)
+    edge_index = process_edges(
+        x, refdataset, x_attack_in_train, x_attack_out_train)
 
     # make graph dataset to attack using pytorch geometric api
     gnn_mia_dataset = Data(x=x, y=y, test_mask=test_mask,
