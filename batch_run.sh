@@ -15,6 +15,7 @@ for attack_model in ${attack_models}; do
                 echo ${logfile}
                 echo ${dataset} ${target_model} ${shadow_model} ${attack_model} ${cur_time};
                 python main.py \
+                    --device cuda\
                     --dataset ${dataset}\
                     --target_model ${target_model} \
                     --shadow_model ${shadow_model} \

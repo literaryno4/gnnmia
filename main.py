@@ -67,7 +67,7 @@ def construct_dataset_and_train_attck_model(model, model_name, attack_in_train_l
     for i in range(refdataset.num_classes):
         optimizer = get_opts(model, model_name)
         dataset = construct_attack_dataset(
-            data, attack_in_train_list[i], attack_out_train_list[i], attack_in_list[i], attack_out_list[i])
+            data, attack_in_train_list[i], attack_out_train_list[i], attack_in_list[i], attack_out_list[i]).to(device)
         _, test_acc = train_model(model, optimizer, dataset, epoches=1000)
         best_test_acc_list.append(test_acc)
 
@@ -101,13 +101,13 @@ if __name__ == '__main__':
     target_model = train_target_model(dataset, target_model_name)
     # take logits of target model as test set of attack model
     attack_in_list, attack_out_list = attack_nodes_list(
-        [target_model], dataset[0])
+        [target_model], dataset[0].to(device))
 
     # train shadow model
     shadow_models = train_shadow_models(dataset, shadow_model_name)
     # take logits of shadow model as test set of attack model
     attack_in_train_list, attack_out_train_list = attack_nodes_list(
-        shadow_models, dataset[0])
+        shadow_models, dataset[0].to(device))
 
     # construct graph dataset and do attack
     num_features = len(attack_in_train_list[0][0])
